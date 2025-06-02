@@ -636,7 +636,6 @@ namespace WebDoChoi.Client
                 ShowErrorMessage("Có lỗi khi cập nhật số lượng");
             }
         }
-
         /// <summary>
         /// Xóa sản phẩm khỏi giỏ hàng
         /// </summary>
@@ -700,7 +699,6 @@ namespace WebDoChoi.Client
         #endregion
 
         #region Event Handlers - Xử lý sự kiện
-
         /// <summary>
         /// Xử lý sự kiện cho cart items - THÊM MỚI
         /// </summary>

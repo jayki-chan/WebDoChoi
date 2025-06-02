@@ -326,6 +326,8 @@
 </div>
 
 <!-- TOÀN BỘ JAVASCRIPT ĐÃ ĐƯỢC CLEAN -->
+// THAY THẾ TOÀN BỘ SCRIPT SECTION TRONG Default.aspx BẰNG CODE NÀY
+
 <script>
 // CRITICAL: Define all functions first
 function handleResponsiveGrid() {
@@ -458,89 +460,6 @@ function updateWishlistDisplay(count) {
         }
     });
     localStorage.setItem('wishlistCount', count);
-}
-
-function addToCart(productId, quantity) {
-    quantity = quantity || 1;
-    
-    showPageLoader();
-    
-    const cartButtons = document.querySelectorAll('[onclick*="addToCart"]');
-    cartButtons.forEach(btn => {
-        btn.disabled = true;
-        btn.classList.add('opacity-50');
-    });
-    
-    try {
-        __doPostBack('', 'addToCart|' + productId + '|' + quantity);
-    } catch (e) {
-        console.log('Add to cart error:', e);
-        hidePageLoader();
-        
-        cartButtons.forEach(btn => {
-            btn.disabled = false;
-            btn.classList.remove('opacity-50');
-        });
-        
-        showNotification('Có lỗi khi thêm vào giỏ hàng', 'error');
-    }
-}
-
-function addToWishlist(productId) {
-    try {
-        showPageLoader();
-        __doPostBack('', 'addToWishlist|' + productId);
-    } catch (e) {
-        console.log('Add to wishlist error:', e);
-        hidePageLoader();
-        showNotification('Có lỗi khi thêm vào yêu thích', 'error');
-    }
-}
-
-function updateCartQuantity(productId, quantity) {
-    if (quantity <= 0) {
-        removeFromCart(productId);
-        return;
-    }
-    
-    try {
-        showPageLoader();
-        __doPostBack('', 'updateCartQuantity|' + productId + '|' + quantity);
-    } catch (e) {
-        console.error('Error updating cart:', e);
-        hidePageLoader();
-    }
-}
-
-function removeFromCart(productId) {
-    if (confirm('Bạn có chắc muốn xóa sản phẩm này khỏi giỏ hàng?')) {
-        showPageLoader();
-        __doPostBack('', 'removeFromCart|' + productId);
-    }
-}
-
-function handleQuantityChange(input, productId) {
-    try {
-        let quantity = parseInt(input.value);
-        if (isNaN(quantity) || quantity < 1) {
-            input.value = 1;
-            quantity = 1;
-        }
-        
-        clearTimeout(input.updateTimeout);
-        input.updateTimeout = setTimeout(() => {
-            updateCartQuantity(productId, quantity);
-        }, 500);
-        
-        input.disabled = true;
-        setTimeout(() => {
-            input.disabled = false;
-        }, 1000);
-        
-    } catch (e) {
-        console.error('Error handling quantity change:', e);
-        input.value = 1;
-    }
 }
 
 function showNotification(message, type = 'info') {
@@ -722,8 +641,8 @@ window.addEventListener('error', function(e) {
 
 console.log('Default.aspx JavaScript loaded successfully');
     </script>
-
 <!-- Add padding bottom for mobile navigation -->
+
 
     <!-- Banner Slideshow -->
     <div class="container mx-auto px-2 sm:px-4 py-4">
@@ -847,7 +766,7 @@ console.log('Default.aspx JavaScript loaded successfully');
                             <i class="fas fa-chevron-right ml-1 text-xs"></i>
                         </a>
                     </div>
-                    
+                   
                     <div class="responsive-grid" id="bestSellingContainer">
                         <asp:Repeater ID="rptBestSellingProducts" runat="server" OnItemCommand="rptBestSellingProducts_ItemCommand">
                             <ItemTemplate>
@@ -857,10 +776,29 @@ console.log('Default.aspx JavaScript loaded successfully');
                                             ImageUrl='<%# Eval("ImageUrl") %>' 
                                             AlternateText='<%# Eval("Name") %>' 
                                             CssClass="w-full h-32 sm:h-40 object-cover transition-transform group-hover:scale-105" 
-                                        
+                                            onerror="this.src='https://via.placeholder.com/300x300?text=No+Image'" />
+                    
+                                        <!-- Product actions overlay - SỬA CHÍNH TẠI ĐÂY -->
                                         <div class="product-actions absolute inset-0 bg-black bg-opacity-20 flex items-center justify-center space-x-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                                            <!-- Thay thế button bằng LinkButton để có server-side event -->
+                                            <asp:LinkButton ID="btnAddToCartBest" runat="server" 
+                                                CommandName="AddToCart" 
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                CssClass="bg-white text-primary p-2 rounded-full hover:bg-primary hover:text-white transition-colors"
+                                                ToolTip="Thêm vào giỏ hàng"
+                                                OnClientClick="showPageLoader(); return true;">
                                                 <i class="fas fa-shopping-cart"></i>
+                                            </asp:LinkButton>
+                        
+                                            <asp:LinkButton ID="btnAddToWishlistBest" runat="server" 
+                                                CommandName="AddToWishlist" 
+                                                CommandArgument='<%# Eval("Id") %>'
+                                                CssClass="bg-white text-primary p-2 rounded-full hover:bg-primary hover:text-white transition-colors"
+                                                ToolTip="Thêm vào yêu thích"
+                                                OnClientClick="showPageLoader(); return true;">
                                                 <i class="fas fa-heart"></i>
+                                            </asp:LinkButton>
+                        
                                             <asp:HyperLink ID="lnkViewDetails" runat="server" 
                                                 NavigateUrl='<%# "/Client/ProductDetails.aspx?id=" + Eval("Id") %>'
                                                 CssClass="bg-white text-primary p-2 rounded-full hover:bg-primary hover:text-white transition-colors"
@@ -868,7 +806,7 @@ console.log('Default.aspx JavaScript loaded successfully');
                                                 <i class="fas fa-eye"></i>
                                             </asp:HyperLink>
                                         </div>
-                                        
+                    
                                         <!-- Badges -->
                                         <div class="absolute top-2 left-2 space-y-1">
                                             <asp:Panel ID="pnlDiscountBadge" runat="server" Visible='<%# Convert.ToInt32(Eval("DiscountPercent")) > 0 %>'>
@@ -879,12 +817,12 @@ console.log('Default.aspx JavaScript loaded successfully');
                                             </asp:Panel>
                                         </div>
                                     </div>
-                                    
+                
                                     <div class="p-2 sm:p-3">
                                         <h3 class="font-medium text-gray-800 line-clamp-2 mb-2 text-sm sm:text-base" title="<%# Eval("Name") %>">
                                             <%# Eval("Name") %>
                                         </h3>
-                                        
+                    
                                         <!-- Rating -->
                                         <div class="flex items-center mb-2">
                                             <div class="flex text-yellow-400 text-xs">
@@ -892,7 +830,7 @@ console.log('Default.aspx JavaScript loaded successfully');
                                             </div>
                                             <span class="text-gray-500 ml-1 text-xs">(<%# Eval("ReviewCount") %>)</span>
                                         </div>
-                                        
+                    
                                         <!-- Price -->
                                         <div class="flex justify-between items-center">
                                             <div class="price">
@@ -1046,6 +984,7 @@ console.log('Default.aspx JavaScript loaded successfully');
                     
                     <asp:Panel ID="pnlCartItems" runat="server" Visible="false">
                         <div class="space-y-3" id="cartItemsContainer">
+                            <asp:Repeater ID="rptCartItems" runat="server" OnItemCommand="rptCartItems_ItemCommand">
                                 <ItemTemplate>
                                     <div class="flex items-start border-b border-gray-100 pb-2">
                                         <div class="bg-gray-100 rounded w-12 h-12 overflow-hidden mr-2 flex-shrink-0">
@@ -1056,28 +995,49 @@ console.log('Default.aspx JavaScript loaded successfully');
                                         </div>
                                         <div class="flex-grow min-w-0">
                                             <h4 class="text-sm font-medium line-clamp-1 mb-1" title="<%# Eval("Name") %>"><%# Eval("Name") %></h4>
-                        
+    
+                                            <!-- SỬA QUANTITY CONTROLS -->
                                             <div class="flex items-center justify-between text-xs mb-1">
                                                 <div class="flex items-center space-x-1">
+                                                    <!-- Nút giảm số lượng -->
+                                                    <asp:LinkButton ID="btnDecreaseQty" runat="server" 
+                                                        CommandName="UpdateQuantity" 
+                                                        CommandArgument='<%# Eval("Id") + "|" + (Convert.ToInt32(Eval("Quantity")) - 1) %>'
+                                                        CssClass="w-5 h-5 flex items-center justify-center bg-gray-200 rounded text-xs hover:bg-gray-300"
+                                                        OnClientClick="showPageLoader(); return true;">
                                                         <i class="fas fa-minus"></i>
+                                                    </asp:LinkButton>
+                                
+                                                    <!-- Hiển thị số lượng hiện tại -->
+                                                    <span class="w-8 text-center text-xs font-medium"><%# Eval("Quantity") %></span>
+                                
+                                                    <!-- Nút tăng số lượng -->
+                                                    <asp:LinkButton ID="btnIncreaseQty" runat="server" 
+                                                        CommandName="UpdateQuantity" 
+                                                        CommandArgument='<%# Eval("Id") + "|" + (Convert.ToInt32(Eval("Quantity")) + 1) %>'
+                                                        CssClass="w-5 h-5 flex items-center justify-center bg-gray-200 rounded text-xs hover:bg-gray-300"
+                                                        OnClientClick="showPageLoader(); return true;">
                                                         <i class="fas fa-plus"></i>
+                                                    </asp:LinkButton>
                                                 </div>
-                            
+        
                                                 <!-- Nút xóa sản phẩm -->
                                                 <asp:LinkButton ID="btnRemoveFromCart" runat="server" 
                                                     CommandName="RemoveFromCart" 
                                                     CommandArgument='<%# Eval("Id") %>'
                                                     CssClass="text-red-500 hover:text-red-600 ml-2"
+                                                    OnClientClick="return confirm('Xóa sản phẩm này khỏi giỏ hàng?');"
+                                                    ToolTip="Xóa sản phẩm">
                                                     <i class="fas fa-trash-alt"></i>
                                                 </asp:LinkButton>
                                             </div>
-                        
+    
                                             <!-- Price info -->
                                             <div class="text-xs">
                                                 <span class="text-primary font-medium"><%# Convert.ToDecimal(Eval("Price")).ToString("N0") %>đ</span>
                                                 <span class="text-gray-500 ml-1">x <%# Eval("Quantity") %></span>
                                             </div>
-                        
+    
                                             <!-- Stock status -->
                                             <asp:Panel ID="pnlStockStatus" runat="server" Visible='<%# !Convert.ToBoolean(Eval("IsAvailable")) %>'>
                                                 <span class="text-red-500 text-xs">Hết hàng</span>
@@ -1087,7 +1047,8 @@ console.log('Default.aspx JavaScript loaded successfully');
                                 </ItemTemplate>
                             </asp:Repeater>
                         </div>
-    
+
+                        <!-- Cart actions - KHÔNG THAY ĐỔI -->
                         <div class="border-t border-gray-200 mt-3 pt-3">
                             <div class="flex justify-between font-medium mb-3">
                                 <span>Tổng cộng:</span>
@@ -1109,7 +1070,6 @@ console.log('Default.aspx JavaScript loaded successfully');
                             </div>
                         </div>
                     </asp:Panel>
-
                 </div>
                 
                 <!-- Advertisement Banner 2 -->
