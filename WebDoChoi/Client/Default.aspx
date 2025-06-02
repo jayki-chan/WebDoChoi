@@ -641,7 +641,7 @@ window.addEventListener('error', function(e) {
 
 console.log('Default.aspx JavaScript loaded successfully');
     </script>
-<!--- Add padding bottom for mobile navigation -->
+<!-- Add padding bottom for mobile navigation -->
 
 
     <!-- Banner Slideshow -->
