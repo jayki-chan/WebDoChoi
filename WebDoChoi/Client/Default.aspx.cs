@@ -636,7 +636,7 @@ namespace WebDoChoi.Client
                 ShowErrorMessage("Có lỗi khi cập nhật số lượng");
             }
         }
-        /// <summary>
+        //// <summary>
         /// Xóa sản phẩm khỏi giỏ hàng
         /// </summary>
         private void RemoveFromCart(int productId)
