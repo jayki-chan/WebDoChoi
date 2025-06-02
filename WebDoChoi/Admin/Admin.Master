@@ -1,0 +1,218 @@
+﻿<%-- Admin/Admin.Master --%>
+<%@ Master Language="C#" AutoEventWireup="true" CodeBehind="Admin.Master.cs" Inherits="WebsiteDoChoi.Admin.AdminMaster" %>
+
+<!DOCTYPE html>
+<html lang="vi">
+<head runat="server">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title><asp:ContentPlaceHolder ID="TitleContent" runat="server">ToyLand Admin</asp:ContentPlaceHolder></title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#FF6B6B',
+                        secondary: '#4ECDC4',
+                        accent: '#FFE66D',
+                        dark: '#1A535C',
+                        light: '#F7FFF7',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Baloo+2:wght@400;500;600;700&display=swap');
+        body { font-family: 'Baloo 2', cursive; }
+        .sidebar { transition: transform 0.3s ease-in-out; }
+        .sidebar-overlay { transition: opacity 0.3s ease-in-out, visibility 0.3s ease-in-out; opacity: 0; visibility: hidden; }
+        .sidebar-overlay.active { opacity: 1; visibility: visible; }
+        @media (max-width: 768px) {
+            .sidebar { transform: translateX(-100%); }
+            .sidebar.active { transform: translateX(0); }
+        }
+        @media (min-width: 769px) {
+            .sidebar { transform: translateX(0); }
+            .sidebar-overlay { display: none; }
+            .main-content-area { margin-left: 16rem; /* 64 * 0.25rem = 256px */ }
+        }
+        .sidebar nav::-webkit-scrollbar { width: 6px; }
+        .sidebar nav::-webkit-scrollbar-track { background: #f1f5f9; border-radius: 3px; }
+        .sidebar nav::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        .sidebar nav::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .sidebar nav { scrollbar-width: thin; scrollbar-color: #cbd5e1 #f1f5f9; }
+        body.sidebar-open { overflow: hidden; }
+        @media (min-width: 769px) {
+            body.sidebar-open { overflow: auto; }
+        }
+        .nav-link-admin.active {
+            background-color: rgba(255, 107, 107, 0.1); /* primary bg-opacity-10 */
+            color: #FF6B6B; /* primary text color */
+        }
+    </style>
+    <asp:ContentPlaceHolder ID="AdminHeadContent" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body class="bg-gray-100">
+    <form id="form1" runat="server">
+        <div class="sidebar-overlay fixed inset-0 bg-black bg-opacity-50 z-40 md:hidden" onclick="closeSidebar()"></div>
+
+        <aside class="sidebar fixed left-0 top-0 h-full w-64 bg-white shadow-lg z-50 flex flex-col">
+            <div class="p-6 border-b border-gray-200">
+                <div class="flex items-center justify-between">
+                    <asp:HyperLink ID="hlAdminLogo" runat="server" NavigateUrl="~/Admin/Default.aspx" CssClass="text-2xl font-bold text-primary">
+                        <span class="text-dark">Toy</span>Land
+                        <i class="fas fa-rocket ml-1 text-secondary"></i>
+                    </asp:HyperLink>
+                    <button class="md:hidden text-gray-600 hover:text-gray-900 p-1" type="button" onclick="closeSidebar()">
+                        <i class="fas fa-times text-xl"></i>
+                    </button>
+                </div>
+                <p class="text-gray-600 text-sm mt-1">Admin Dashboard</p>
+            </div>
+
+            <nav class="mt-6 flex-1 overflow-y-auto px-4 pb-4">
+                <ul class="space-y-1">
+                    <li><asp:HyperLink ID="lnkDashboard" runat="server" NavigateUrl="~/Admin/Default.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-tachometer-alt w-5"></i><span class="ml-3">Dashboard</span></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkProducts" runat="server" NavigateUrl="~/Admin/Products.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-cubes w-5"></i><span class="ml-3">Sản phẩm</span><asp:Literal ID="litProductCount" runat="server" Text="<span class='ml-auto bg-primary text-white rounded-full px-2 py-1 text-xs'>0</span>"></asp:Literal></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkOrders" runat="server" NavigateUrl="~/Admin/Orders.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-shopping-cart w-5"></i><span class="ml-3">Đơn hàng</span><asp:Literal ID="litOrderCount" runat="server" Text="<span class='ml-auto bg-secondary text-white rounded-full px-2 py-1 text-xs'>0</span>"></asp:Literal></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkCustomers" runat="server" NavigateUrl="~/Admin/Customers.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-users w-5"></i><span class="ml-3">Khách hàng</span></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkCategories" runat="server" NavigateUrl="~/Admin/Categories.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-tags w-5"></i><span class="ml-3">Danh mục</span></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkReports" runat="server" NavigateUrl="~/Admin/Reports.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-chart-bar w-5"></i><span class="ml-3">Báo cáo</span></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkPromotions" runat="server" NavigateUrl="~/Admin/Promotions.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-percent w-5"></i><span class="ml-3">Khuyến mãi</span></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkShipping" runat="server" NavigateUrl="~/Admin/Shipping.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-truck w-5"></i><span class="ml-3">Vận chuyển</span></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkReviews" runat="server" NavigateUrl="~/Admin/Reviews.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-star w-5"></i><span class="ml-3">Đánh giá</span></asp:HyperLink></li>
+                     <li><asp:HyperLink ID="lnkBlogManagement" runat="server" NavigateUrl="~/Admin/BlogManagement.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-newspaper w-5"></i><span class="ml-3">Quản lý Blog</span></asp:HyperLink></li>
+                    <li><asp:HyperLink ID="lnkSettings" runat="server" NavigateUrl="~/Admin/Settings.aspx" CssClass="nav-link-admin flex items-center px-4 py-3 text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"><i class="fas fa-cog w-5"></i><span class="ml-3">Cài đặt</span></asp:HyperLink></li>
+                </ul>
+            </nav>
+
+            <div class="p-4 border-t border-gray-200 bg-white mt-auto">
+                <div class="flex items-center">
+                    <asp:Image ID="imgAdminAvatar" runat="server" ImageUrl="https://api.placeholder.com/40/40?text=A" CssClass="w-10 h-10 rounded-full" />
+                    <div class="ml-3">
+                        <asp:Label ID="lblAdminName" runat="server" Text="Admin User" CssClass="text-sm font-medium text-gray-700"></asp:Label>
+                        <asp:Label ID="lblAdminEmail" runat="server" Text="admin@toyland.vn" CssClass="text-xs text-gray-500"></asp:Label>
+                    </div>
+                    <asp:LinkButton ID="lnkAdminLogout" runat="server" OnClick="lnkAdminLogout_Click" CssClass="ml-auto text-gray-400 hover:text-red-600" ToolTip="Đăng xuất">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </asp:LinkButton>
+                </div>
+            </div>
+        </aside>
+
+        <div class="main-content-area min-h-screen flex flex-col">
+            <header class="bg-white shadow-sm border-b border-gray-200 px-4 md:px-6 py-4 sticky top-0 z-30">
+                <div class="flex items-center justify-between">
+                    <div class="flex items-center">
+                        <button class="md:hidden text-gray-600 hover:text-gray-900 mr-4 p-2" type="button" onclick="openSidebar()">
+                            <i class="fas fa-bars text-xl"></i>
+                        </button>
+                        <asp:ContentPlaceHolder ID="PageTitleContent" runat="server">
+                             <h1 class="text-xl md:text-2xl font-bold text-gray-800">Dashboard</h1>
+                        </asp:ContentPlaceHolder>
+                    </div>
+                    <div class="flex items-center space-x-2 md:space-x-4">
+                        <div class="hidden md:block relative">
+                            <asp:TextBox ID="txtAdminSearch" runat="server" placeholder="Tìm kiếm..." CssClass="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:border-primary w-64"></asp:TextBox>
+                            <i class="fas fa-search absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400"></i>
+                        </div>
+                        <button class="md:hidden p-2 text-gray-600 hover:text-gray-900" type="button" onclick="alert('Chức năng tìm kiếm mobile!')">
+                            <i class="fas fa-search text-lg"></i>
+                        </button>
+                        <asp:HyperLink ID="hlNotifications" runat="server" NavigateUrl="~/Admin/Notifications.aspx" CssClass="relative p-2 text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-bell text-lg md:text-xl"></i>
+                            <asp:Literal ID="litNotificationCount" runat="server" Text="<span class='absolute -top-1 -right-1 bg-primary text-white rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center text-xs'>0</span>"></asp:Literal>
+                        </asp:HyperLink>
+                         <asp:HyperLink ID="hlMessages" runat="server" NavigateUrl="~/Admin/Messages.aspx" CssClass="relative p-2 text-gray-600 hover:text-gray-900">
+                            <i class="fas fa-envelope text-lg md:text-xl"></i>
+                             <asp:Literal ID="litMessageCount" runat="server" Text="<span class='absolute -top-1 -right-1 bg-secondary text-white rounded-full w-4 h-4 md:w-5 md:h-5 flex items-center justify-center text-xs'>0</span>"></asp:Literal>
+                        </asp:HyperLink>
+                    </div>
+                </div>
+            </header>
+
+            <main class="p-4 md:p-6 flex-grow">
+                <asp:ContentPlaceHolder ID="AdminMainContent" runat="server">
+                    <%-- Nội dung của các trang admin cụ thể sẽ được đặt ở đây --%>
+                </asp:ContentPlaceHolder>
+            </main>
+            
+            <footer class="bg-white border-t border-gray-200 p-4 text-center text-sm text-gray-500">
+                &copy; <asp:Literal ID="litCurrentYear" runat="server"></asp:Literal> ToyLand Admin. All rights reserved.
+            </footer>
+        </div>
+
+        <script type="text/javascript">
+            function openSidebar() {
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (sidebar) sidebar.classList.add('active');
+                if (overlay) overlay.classList.add('active');
+                document.body.classList.add('sidebar-open');
+            }
+            function closeSidebar() {
+                const sidebar = document.querySelector('.sidebar');
+                const overlay = document.querySelector('.sidebar-overlay');
+                if (sidebar) sidebar.classList.remove('active');
+                if (overlay) overlay.classList.remove('active');
+                document.body.classList.remove('sidebar-open');
+            }
+             // Handle navigation clicks on mobile to close sidebar
+            function handleAdminNavClick(event) {
+                // Check if the clicked element is an anchor tag within the sidebar nav
+                const navLink = event.target.closest('a');
+                if (navLink && navLink.closest('.sidebar nav')) {
+                    // Highlight active link
+                    document.querySelectorAll('.sidebar .nav-link-admin').forEach(link => link.classList.remove('active'));
+                    navLink.classList.add('active');
+                    
+                    if (window.innerWidth < 769) { // Only close on mobile
+                        closeSidebar();
+                    }
+                }
+            }
+            // Add event listener to the sidebar navigation
+            document.addEventListener('DOMContentLoaded', function() {
+                const sidebarNav = document.querySelector('.sidebar nav');
+                if(sidebarNav) {
+                    sidebarNav.addEventListener('click', handleAdminNavClick);
+                }
+
+                // Set active class for current page
+                const currentPath = window.location.pathname.toLowerCase();
+                document.querySelectorAll('.sidebar .nav-link-admin').forEach(link => {
+                    const linkPath = new URL(link.href, window.location.origin).pathname.toLowerCase();
+                    if (currentPath === linkPath || (currentPath === '/admin/' && linkPath === '/admin/default.aspx')) { // Handle root default
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+
+                 if (window.innerWidth < 769) {
+                    closeSidebar(); // Ensure closed on mobile load
+                }
+            });
+
+             window.addEventListener('resize', function() {
+                if (window.innerWidth >= 769) {
+                    const sidebar = document.querySelector('.sidebar');
+                    const body = document.body;
+                    if(sidebar) sidebar.classList.remove('active'); // Ensure it's not in mobile active state
+                    if(body) body.classList.remove('sidebar-open');
+                }
+            });
+            document.addEventListener('keydown', function(event) {
+                if (event.key === 'Escape' && window.innerWidth < 769) {
+                    closeSidebar();
+                }
+            });
+        </script>
+        <asp:ContentPlaceHolder ID="AdminScriptsContent" runat="server"></asp:ContentPlaceHolder>
+    </form>
+</body>
+</html>
