@@ -641,7 +641,7 @@ console.log('Default.aspx JavaScript loaded successfully');
     </script>
 <!-- Add padding bottom for mobile navigation -->
 
-
+    <!-->
     <!-- Banner Slideshow -->
     <div class="container mx-auto px-2 sm:px-4 py-4">
         <div class="banner-container rounded-lg overflow-hidden relative shadow-lg bg-gray-200">
